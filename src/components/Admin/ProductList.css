@@ -47,6 +47,21 @@
   color: rgb(255, 255, 255);
 }
 
+/* .submit {
+  width:25%;
+  border: none;
+  overflow: hidden;
+  background-color: tomato;
+  font: 500 0.7vmax "Roboto";
+  border-radius: 20px;
+  padding:auto;
+  margin: 1vmax 0;
+  color: white;
+  cursor: pointer;
+  transition: all 0.5s;
+  outline: none;
+} */
+
 @media screen and (max-width: 600px) {
   .productListTable div {
     font: 300 4vw "Roboto";

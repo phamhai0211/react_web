@@ -1,29 +1,30 @@
-import React,{Fragment} from 'react'
+import React, { Fragment } from 'react'
 import CheckOutSteps from '../Cart/CheckOutSteps'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import MetaData from "../layout/MetaData"
 import "./ConfirmOrder.css"
-import {Link} from "react-router-dom"
-import {Typography} from "@material-ui/core"
-const ConfirmOrder = ({history}) => {
-
-  const {shippingInfo, cartItems} = useSelector((state)=>state.cart)
-  const {user} = useSelector((state)=>state.user)
+import { Link } from "react-router-dom"
+import { Typography } from "@material-ui/core"
+import { createOrder, clearErrors } from "../../actions/orderActions"
+const ConfirmOrder = ({ history }) => {
+  const dispatch = useDispatch()
+  const { shippingInfo, cartItems } = useSelector((state) => state.cart)
+  const { user } = useSelector((state) => state.user)
 
   const subtotal = cartItems.reduce(
-    (acc,item)=> acc + item.quantity * item.price,
+    (acc, item) => acc + item.quantity * item.price,
     0
-    )
-  
+  )
+
   const shippingCharges = subtotal > 1000 ? 0 : 200
   const tax = subtotal * 0.18
 
   const totalPrice = subtotal + tax + shippingCharges
 
-  const address = 
-  `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state}, ${shippingInfo.pinCode}, ${shippingInfo.country}`
+  const address =
+    `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.state}, ${shippingInfo.pinCode}, ${shippingInfo.country}`
 
-  const proceedToPayment = ()=>{
+  const proceedToPayment = () => {
     const data = {
       subtotal,
       shippingCharges,
@@ -35,6 +36,32 @@ const ConfirmOrder = ({history}) => {
 
     history.push("/process/payment");
   }
+  //  const orderInfo = JSON.parse(sessionStorage.getItem("orderInfo"))
+  //  const order = {
+  //    shippingInfo,
+  //    orderItems: cartItems,
+  //    itemsPrice: orderInfo.subtotal,
+  //    taxPrice: orderInfo.tax,
+  //   shippingPrice: orderInfo.shippingCharges,
+  //   totalPrice: orderInfo.totalPrice,
+  // }
+  // const noPayment = () => {
+  //   const data = {
+  //     subtotal,
+  //     shippingCharges,
+  //     tax,
+  //     totalPrice
+  //   }
+  //  let i = Math.floor(Math.random() * 1000000)
+  //   order.paymentInfo = {
+  //     id:i,
+  //     status:"offline",
+  //     method:"offline"
+  //   }
+  //   dispatch(createOrder(order))
+  //   sessionStorage.setItem("orderInfo", JSON.stringify(data));
+    
+  //  }
   return (
     <Fragment>
       <MetaData title="Confirm Order" />
@@ -104,6 +131,7 @@ const ConfirmOrder = ({history}) => {
             </div>
 
             <button onClick={proceedToPayment}>Proceed To Payment</button>
+            
           </div>
         </div>
       </div>

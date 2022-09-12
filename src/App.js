@@ -34,6 +34,22 @@ import OrderDetails from './components/Order/OrderDetails';
 import Dashboard from './components/Admin/Dashboard';
 import ProductList from './components/Admin/ProductList';
 import NewProduct from './components/Admin/NewProduct';
+import UpdateProduct from './components/Admin/UpdateProduct';
+import ProcessOrder from './components/Admin/ProcessOrder';
+import OrderList from './components/Admin/OrderList';
+import UserList from './components/Admin/UserList'
+import UpdateUser from './components/Admin/UpdateUser';
+import CategoryList from "./components/Admin/CategoryList";
+import NewCategory from "./components/Admin/NewCategory"
+import StaffList from "./components/Admin/StaffList"
+import ProductReviews from './components/Admin/ProductReviews';
+import NewStaff from './components/Admin/NewStaff';
+import UpdateStaff from './components/Admin/UpdateStaff';
+import Contact from "./components/layout/Contact/Contact"
+import About from "./components/layout/About/About"
+import BrandList from './components/Admin/BrandList';
+import NewBrand from './components/Admin/NewBrand';
+import RefundOrder from './components/Order/RefundOrder';
 function App() {
 
   const { isAuthenticated, user } = useSelector((state) => state.user)
@@ -88,7 +104,8 @@ function App() {
         <ProtectRoute extact path="/success" component={OrderSuccess} />
         <ProtectRoute extact path="/orders" component={MyOrder} />
         <ProtectRoute extact path="/order/:id" component={OrderDetails} />
-
+        <Route exact path="/contact" component={Contact} />
+        <Route exact path="/about" component={About} />
         <ProtectRoute
           extact
           isAdmin={true}
@@ -100,12 +117,99 @@ function App() {
           isAdmin={true}
           path="/admin/products"
           component={ProductList} />
-          
-        <ProtectRoute 
-        extact 
-        isAdmin={true}
-        path="/admin/product" 
-        component={NewProduct} />
+
+        <ProtectRoute
+          extact
+          isAdmin={true}
+          path="/admin/product"
+          component={NewProduct} />
+
+        <ProtectRoute
+          extact
+          isAdmin={true}
+          path="/admin/product11/:id"
+          component={UpdateProduct}
+        />
+
+        <ProtectRoute
+          extact
+          isAdmin={true}
+          path="/admin/orders"
+          component={OrderList}
+        />
+
+        <ProtectRoute
+          extact
+          isAdmin={true}
+          path="/admin/order11/:id"
+          component={ProcessOrder}
+        />
+
+        <ProtectRoute
+          extact
+          isAdmin={true}
+          path="/admin/users"
+          component={UserList}
+        />
+
+        <ProtectRoute
+          extact
+          idAmin={true}
+          path="/admin/user11/:id"
+          component={UpdateUser}
+        />
+
+        <ProtectRoute
+          extact
+          isAdmin={true}
+          path="/admin/categories"
+          component={CategoryList}
+        />
+
+        <ProtectRoute
+          exact
+          isAdmin={true}
+          path="/admin/category"
+          component={NewCategory}
+        />
+
+        <ProtectRoute
+          exact
+          isAdmin={true}
+          path="/admin/staffs"
+          component={StaffList}
+        />
+
+        <ProtectRoute
+          exact
+          path="/admin/reviews"
+          isAdmin={true}
+          component={ProductReviews}
+        />
+        <ProtectRoute
+          exact
+          path="/admin/staff"
+          isAdmin={true}
+          component={NewStaff}
+        />
+        <ProtectRoute
+          exact
+          path="/admin/staff11/:id"
+          isAdmin={true}
+          component={UpdateStaff}
+        />
+        <ProtectRoute
+          exact
+          path="/admin/brands"
+          isAdmin={true}
+          component={BrandList}
+        />
+        <ProtectRoute
+          exact
+          path="/admin/brand"
+          isAdmin={true}
+          component={NewBrand}
+        />
       </Switch>
 
       <Footer />

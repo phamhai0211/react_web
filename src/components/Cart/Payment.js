@@ -4,7 +4,7 @@ import "./Payment.css"
 import CheckOutSteps from '../Cart/CheckOutSteps';
 import { useSelector, useDispatch } from 'react-redux';
 import MetaData from '../layout/MetaData';
-import { Typography } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 import { useAlert } from "react-alert";
 import {
   CardNumberElement,
@@ -30,7 +30,7 @@ const Payment = ({ history }) => {
 
   const { shippingInfo, cartItems } = useSelector((state) => state.cart)
   const { user } = useSelector((state) => state.user)
-  const {error} = useSelector((state)=>state.newOrder)
+  const { error } = useSelector((state) => state.newOrder)
   const paymentData = {
     amount: Math.round(orderInfo.totalPrice),
 
@@ -88,13 +88,14 @@ const Payment = ({ history }) => {
         payBtn.current.disabled = false
       } else {
         if (result.paymentIntent.status === "succeeded") {
-            order.paymentInfo = {
-              id: result.paymentIntent.id, 
-              status : result.paymentIntent.status
-            }
-            dispatch(createOrder(order));
-            history.push("/success");
-        } 
+          order.paymentInfo = {
+            id: result.paymentIntent.id,
+            status: result.paymentIntent.status,
+            method: "paypal"
+          }
+          dispatch(createOrder(order));
+          history.push("/success");
+        }
         else {
           alert.show("There's some issue while processing payment ");
         }
@@ -105,13 +106,23 @@ const Payment = ({ history }) => {
       alert.show(error.response.data.message);
     }
   }
+   const offLineHanler = () => {
 
-  useEffect(()=>{
-    if(error){
+    let i = Math.floor(Math.random() * 1000000)
+    order.paymentInfo = {
+      id: i,
+      status: "offline",
+      method: "offline"
+    }
+   dispatch(createOrder(order))
+    history.push("/success")
+   }
+  useEffect(() => {
+    if (error) {
       alert.show(error)
       dispatch(clearErrors())
     }
-  },[dispatch, error, alert])
+  }, [dispatch, error, alert])
   return (
     <Fragment>
       <MetaData title="Payment" />
@@ -139,6 +150,12 @@ const Payment = ({ history }) => {
             className="paymentFormBtn"
           />
         </form>
+        <button
+          className="payment_offline"
+          onClick={offLineHanler}
+        >
+          Offline
+        </button>
       </div>
     </Fragment>
   )

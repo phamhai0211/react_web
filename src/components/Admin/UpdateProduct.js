@@ -1,30 +1,35 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import "./NewProduct.css"
-import { useSelector, useDispatch } from "react-redux"
-import { clearErrors, createProduct } from '../../actions/productActions'
+import { useSelector, useDispatch } from 'react-redux'
 import { useAlert } from "react-alert"
 import { Button } from "@material-ui/core"
 import MetaData from "../layout/MetaData"
-import AccountTreeIcon from "@material-ui/icons/AccountTree"
-import DescriptionIcon from "@material-ui/icons/Description"
+import AccountTreeIcon from '@material-ui/icons/AccountTree'
+import DescriptionIcon from '@material-ui/icons/Description';
 import StorageIcon from "@material-ui/icons/Storage"
-import SpellcheckIcon from "@material-ui/icons/Spellcheck"
-import AttachMoneyIcon from "@material-ui/icons/AttachMoney"
-import Link from "react-router-dom"
-import SideBar from "./Sidebar.js"
-import { getCategories } from "../../actions/cateActions"
-import { getBrands } from '../../actions/brandActions'
-import { NEW_PRODUCT_RESET } from '../../constants/productContants'
-const NewProduct = ({ history }) => {
+import SpellcheckIcon from '@material-ui/icons/Spellcheck';
+import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import SideBar from "./Sidebar"
+import { getDetailProduct, clearErrors, updateProduct } from './../../actions/productActions';
+import { getCategories } from './../../actions/cateActions'
+import { getBrands } from './../../actions/brandActions'
+import { UPDATE_PRODUCT_RESET } from '../../constants/productContants'
+const UpdateProduct = ({ match, history }) => {
+
   const dispatch = useDispatch()
   const alert = useAlert()
-  const { error, loading, success } = useSelector((state) => state.newProduct)
-  const [name, setName] = useState("");
+
+  const { error, product } = useSelector((state) => state.productDetails)
+
+  const { loading, error: updateError, isUpdated } = useSelector((state) => state.product)
+  const { categories } = useSelector((state) => state.categories)
+  const {brands} = useSelector((state) => state.brands)
+  const [name, setName] = useState("")
   const [price, setPrice] = useState(0)
   const [description, setDescription] = useState("")
   const [category, setCategory] = useState("")
   const [Stock, setStock] = useState(0)
   const [images, setImages] = useState([])
+  const [oldImages, setOldImages] = useState([])
   const [imagesPreview, setImagesPreview] = useState([])
   const [brand, setBrand] = useState("")
   // const categories = [
@@ -36,26 +41,37 @@ const NewProduct = ({ history }) => {
   //   "Camera",
   //   "SmartPhones",
   // ];
-  const { categories } = useSelector((state) => state.categories)
-  const { brands } = useSelector((state) => state.brands)
+
+  const productId = match.params.id
+
   useEffect(() => {
+    if (product && product._id !== productId) {
+      dispatch(getDetailProduct(productId))
+    } else {
+      setName(product.name)
+      setDescription(product.description)
+      setPrice(product.price)
+      setCategory(product.category)
+      setStock(product.Stock)
+      setOldImages(product.images)
+      setBrand(product.brand)
+    }
     if (error) {
-      alert.error(error)
+      alert.show(error)
       dispatch(clearErrors())
     }
 
-    if (success) {
-      alert.show("Create product successfully")
-      // history.push("/admin/dashboard")
-      dispatch({ type: NEW_PRODUCT_RESET })
-
+    if (updateError) {
+      alert.show(updateError)
+      dispatch(clearErrors())
     }
-    dispatch(getBrands())
-    dispatch(getCategories())
-  }, [dispatch, alert, error, history, success])
-
-
-  const createProductSubmitHandler = (e) => {
+    if (isUpdated) {
+      alert.show("update product successfully")
+      history.push("/admin/products")
+      dispatch({ type: UPDATE_PRODUCT_RESET })
+    }
+  }, [dispatch, alert, error, isUpdated, updateError, history, productId, product])
+  const updateProductSubmitHandler = (e) => {
     e.preventDefault()
 
     const myForm = new FormData()
@@ -70,18 +86,19 @@ const NewProduct = ({ history }) => {
     images.forEach((image) => {
       myForm.append("images", image)
     })
-
-    dispatch(createProduct(myForm))
+    dispatch(updateProduct(productId, myForm))
   }
 
-  const createProductImagesChange = (e) => {
+  const updateProductImagesChange = (e) => {
     const files = Array.from(e.target.files)
 
     setImages([])
     setImagesPreview([])
+    setOldImages([])
 
     files.forEach((file) => {
-      const reader = new FileReader()
+      const reader = new FileReader();
+
       reader.onload = () => {
         if (reader.readyState === 2) {
           setImagesPreview((old) => [...old, reader.result])
@@ -91,21 +108,19 @@ const NewProduct = ({ history }) => {
       reader.readAsDataURL(file)
     })
   }
-
-
   return (
+
     <Fragment>
-      <MetaData title="Create Product" />
+      <MetaData title="Update Product" />
       <div className="dashboard">
         <SideBar />
         <div className="newProductContainer">
           <form
             className="createProductForm"
             encType="multipart/form-data"
-            onSubmit={createProductSubmitHandler}
+            onSubmit={updateProductSubmitHandler}
           >
-            <h1>Create Product</h1>
-
+            <h1>Update Product</h1>
             <div>
               <SpellcheckIcon />
               <input
@@ -123,6 +138,7 @@ const NewProduct = ({ history }) => {
                 placeholder="Price"
                 required
                 onChange={(e) => setPrice(e.target.value)}
+                value={price}
               />
             </div>
 
@@ -140,7 +156,10 @@ const NewProduct = ({ history }) => {
 
             <div>
               <AccountTreeIcon />
-              <select onChange={(e) => setCategory(e.target.value)}>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
                 <option value="">Choose Category</option>
                 {categories.map((cate) => (
                   <option key={cate.name} value={cate.name}>
@@ -151,11 +170,14 @@ const NewProduct = ({ history }) => {
             </div>
             <div>
               <AccountTreeIcon />
-              <select onChange={(e) => setBrand(e.target.value)}>
+              <select
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+              >
                 <option value="">Choose Brand</option>
-                {brands.map((item) => (
-                  <option key={item.name} value={item.name}>
-                    {item.name}
+                {brands.map((brand) => (
+                  <option key={brand.name} value={brand.name}>
+                    {brand.name}
                   </option>
                 ))}
               </select>
@@ -167,6 +189,7 @@ const NewProduct = ({ history }) => {
                 placeholder="Stock"
                 required
                 onChange={(e) => setStock(e.target.value)}
+                value={Stock}
               />
             </div>
 
@@ -175,9 +198,16 @@ const NewProduct = ({ history }) => {
                 type="file"
                 name="avatar"
                 accept="image/*"
-                onChange={createProductImagesChange}
+                onChange={updateProductImagesChange}
                 multiple
               />
+            </div>
+
+            <div id="createProductFormImage">
+              {oldImages &&
+                oldImages.map((image, index) => (
+                  <img key={index} src={image.url} alt="Old Product Preview" />
+                ))}
             </div>
 
             <div id="createProductFormImage">
@@ -189,9 +219,9 @@ const NewProduct = ({ history }) => {
             <Button
               id="createProductBtn"
               type="submit"
-              //disabled={loading ? true : false}
+             // disabled={loading ? true : false}
             >
-              Create
+              Update Product
             </Button>
           </form>
         </div>
@@ -200,4 +230,4 @@ const NewProduct = ({ history }) => {
   )
 }
 
-export default NewProduct
+export default UpdateProduct

@@ -8,10 +8,11 @@ import MetaData from "../layout/MetaData"
 import "./Dashboard.css"
 import Chart from "chart.js/auto"
 import { getAdminProduct } from '../../actions/productActions.js'
+import { getAllOrders } from '../../actions/orderActions.js'
 const Dashboard = () => {
   const dispatch = useDispatch()
   const { products } = useSelector((state) => state.products)
-
+  const {orders} = useSelector((state) => state.allOrders)
   let outOfStock = 0
 
   products &&
@@ -23,7 +24,12 @@ const Dashboard = () => {
 
   useEffect(()=>{
       dispatch(getAdminProduct())
+      dispatch(getAllOrders())
   },[dispatch])
+  let totalAmount = 0
+  orders && orders.forEach((item)=>{
+    totalAmount += item.totalPrice
+  })
   const lineState = {
     labels: ["Initial Amount", "Amount Earned"],
     datasets: [
@@ -31,7 +37,7 @@ const Dashboard = () => {
         label: "Total Amount",
         backgroundColor: "tomato",
         hoverBackgroundColor: ["rgb(197,72,49)"],
-        data: [0, 4000]
+        data: [0, totalAmount]
       }
     ]
   }
@@ -57,7 +63,7 @@ const Dashboard = () => {
         <div className="dashboardSummary">
           <div>
             <p>
-              Total Amount <br /> VND 2200
+              Total Amount <br /> VND {totalAmount}
             </p>
           </div>
           <div className="dashboardSummaryBox2">
@@ -67,7 +73,7 @@ const Dashboard = () => {
             </Link>
             <Link to="/admin/orders">
               <p>Orders</p>
-              <p>10</p>
+              <p>{orders && orders.length}</p>
             </Link>
             <Link to="/admin/users">
               <p>Users</p>

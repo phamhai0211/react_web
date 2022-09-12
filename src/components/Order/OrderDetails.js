@@ -1,5 +1,6 @@
-import React, { Fragment, useEffect } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import "./OrderDetails.css"
+import "./RefundOrder.css"
 import MetaData from '../layout/MetaData'
 import { useSelector, useDispatch } from "react-redux"
 import { Link } from 'react-router-dom'
@@ -7,18 +8,42 @@ import { Typography } from '@material-ui/core'
 import { getOrderDetails, clearErrors } from './../../actions/orderActions';
 import Loader from '../layout/Loader/Loader'
 import { useAlert } from 'react-alert'
+import { Button } from "@material-ui/core"
+import { updateOrder } from './../../actions/orderActions'
+import MailOutlineIcon from "@material-ui/icons/MailOutline";
+import { refundOrder } from "../../actions/orderActions";
+import AccountTreeIcon from '@material-ui/icons/AccountTree'
 const OrderDetails = ({ match }) => {
   const { order, error, loading } = useSelector((state) => state.orderDetails)
   const dispatch = useDispatch()
   const alert = useAlert()
+  const { error: isRefundErr, message } = useSelector((state) => state.refund)
+  const { error: updateError, isUpdated } = useSelector((state) => state.order)
 
+  const [status, setStatus] = useState("")
+  const refundHandlerSubmit = (e) => {
+    e.preventDefault()
+    const myForm = new FormData()
+    myForm.set("status", status)
+    dispatch(updateOrder(match.params.id, myForm))
+  }
   useEffect(() => {
     if (error) {
-      alert.show(error)
+      alert.error(error)
       dispatch(clearErrors())
     }
+    if (isRefundErr) {
+      alert.error(isRefundErr)
+      dispatch(clearErrors())
+    }
+    if (isUpdated) {
+      alert.show("Orders has refund")
+    }
+    if (message) {
+      alert.success(message)
+    }
     dispatch(getOrderDetails(match.params.id))
-  }, [error, dispatch, match.params.id, alert])
+  }, [error, dispatch, match.params.id, alert, message])
   return (
     <Fragment>
       {
@@ -101,13 +126,53 @@ const OrderDetails = ({ match }) => {
                           {item.name}
                         </Link>{" "}
                         <span>
-                          {item.quantity} X ₹{item.price} ={" "}
+                          {item.quantity} X VND{item.price} ={" "}
                           <b>VND{item.price * item.quantity}</b>
                         </span>
                       </div>
                     ))}
                 </div>
               </div>
+
+
+              <form
+                className="forgotPasswordForm"
+                onSubmit={refundHandlerSubmit}
+                style={{
+                  width: '50%',
+                  display: 'flex',
+                  flexDirection: 'column', 
+                  alignItems:'center',
+                  textAlign:'center'
+                }}
+              >
+                <div
+                  style={{
+                    paddingBottom:'5px',
+                    
+                  }}
+                >
+                  <AccountTreeIcon />
+                  <select 
+                  style={{marginLeft:"10px"}}
+                  onChange={(e) => setStatus(e.target.value)}>
+                    <option value="">Choose Category</option>
+                    {order.orderStatus === "Processing" && (
+                      <option value="Refund">Refund</option>
+                    )}
+                  </select>
+                </div>
+
+                <Button
+                  id="createProductBtn"
+                  type="submit"
+                  disabled={
+                    loading ? true : false || status === "" ? true : false
+                  }
+                >
+                  Refund
+                </Button>
+              </form>
             </div>
           </Fragment>)
       }

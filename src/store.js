@@ -2,33 +2,77 @@ import thunk from "redux-thunk"
 import React from "react"
 import { createStore, applyMiddleware, combineReducers } from "redux"
 import { composeWithDevTools } from "redux-devtools-extension"
-import { 
-    productsReducer, 
+import {
+    productsReducer,
     productDetailReducer,
     newReviewReducer,
     newProductReducer,
-    productReducer
+    productReducer,
+    productReviewsReducer,
+    reviewReducer
 } from "./reducer/productReducer"
 import {
     userReducer,
     profileReducer,
-    forgotPasswordReducer
+    forgotPasswordReducer,
+    allUsersReducer,
+    userDetailsReducer
 } from "./reducer/userReducer"
+import {
+    categoriesReducer,
+    newCategoryReducer,
+    categoryReducer
+} from "./reducer/categoryReducer"
 import { cartReducer } from "./reducer/cartReducer"
-import { myOrdersReducer, newOrderReducer, orderDetailsReducer } from './reducer/orderReducer';
+import {
+    allOrdersReducer,
+    myOrdersReducer,
+    newOrderReducer,
+    orderDetailsReducer,
+    orderReducer,
+    refundOrderReducer
+} from './reducer/orderReducer';
+import {
+    staffsReducer,
+    newStaffReducer,
+    staffReducer,
+    staffDetailReducer
+} from "./reducer/staffReducer"
+import {
+    brandsReducer,
+    brandReducer,
+    newBrandReducer
+} from "./reducer/brandReducer"
 const reducer = combineReducers({
     products: productsReducer,
     productDetails: productDetailReducer,
+    categories: categoriesReducer,
     user: userReducer,
     profile: profileReducer,
     forgotPassword: forgotPasswordReducer,
     cart: cartReducer,
-    newOrder : newOrderReducer,
-    myOrders : myOrdersReducer,
-    orderDetails:orderDetailsReducer,
+    newOrder: newOrderReducer,
+    myOrders: myOrdersReducer,
+    orderDetails: orderDetailsReducer,
     newReview: newReviewReducer,
     newProduct: newProductReducer,
-    product:productReducer
+    product: productReducer,
+    newCategory: newCategoryReducer,
+    allOrders: allOrdersReducer,
+    order: orderReducer,
+    allUsers: allUsersReducer,
+    userDetails: userDetailsReducer,
+    staffs: staffsReducer,
+    productReviews: productReviewsReducer,
+    review: reviewReducer,
+    newStaff: newStaffReducer,
+    staff: staffReducer,
+    staffDetail: staffDetailReducer,
+    category: categoryReducer,
+    newBrand: newBrandReducer,
+    brands: brandsReducer,
+    brand: brandReducer,
+    refund:refundOrderReducer
 })
 
 let initialState = {
